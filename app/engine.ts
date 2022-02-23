@@ -29,7 +29,6 @@ export class Engine {
 
   public start(): void {
     this.active = true;
-    console.log('test')
   }
 
   public stop(): void {
