@@ -6,11 +6,13 @@ html, body {
 
   body {
     background-color: #555;
+    font-family: sans-serif;
   }
 
   main {
     height: 100%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
   }
@@ -20,5 +22,32 @@ html, body {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+    color: white;
+  }
+
+  #scoreBoard {
+    display: none;
+    justify-content: center;
+    color: white;
+  }
+
+  #gameOverMessage {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #555;
+    border-radius: 3px;
+    padding: 30px 60px;
+    color: white;
+    display: none;
+  }
+
+  #gameOverMessage button {
+    width: 100%;
+    font-weight: bold;
+    padding: 10px;
+    cursor: pointer;
+    background-color: darkgoldenrod;
     color: white;
   }

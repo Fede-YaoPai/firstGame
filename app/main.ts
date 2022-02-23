@@ -1,13 +1,22 @@
 import { Engine } from "./engine.js";
 import { Game } from "./game.js";
 
-const game: Game = Game.Instance;
-const engine: Engine = new Engine();
+let game: Game = Game.Instance;
+let engine: Engine = Engine.Instance;
 
-engine.load()
+const startGame = () => {
+  engine.load()
   .then(() => game.setUp())
   .then(() => engine.start()
-);
+  );
+}
+
+startGame();
+
+
+
+
+
 
 
 
