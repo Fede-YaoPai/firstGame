@@ -8,6 +8,7 @@ import { Arrows, PlayerInit } from "./utils/constants.js";
 
 export class Game {
   private static _instance: Game;
+  private over: boolean = false;
 
   private canvas!: HTMLCanvasElement;
   private canvasSettings = new CanvasConfig();
@@ -15,6 +16,7 @@ export class Game {
   private physics = new Physics();
 
   private player = new Player();
+  private score: number = 0;
 
   private isMovingLeft: boolean = false;
   private isMovingRight: boolean = false;
@@ -35,7 +37,8 @@ export class Game {
     let canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
 
     this.setCanvas(canvas);
-    this.addMovementListeners();
+    this.setMovementListeners();
+    this.setScoreBoard();
   }
 
   private setCanvas(canvas: HTMLCanvasElement): void {
@@ -50,7 +53,7 @@ export class Game {
     if (ctx) this.canvasCtx = ctx;    
   }
 
-  private addMovementListeners(): void {
+  private setMovementListeners(): void {
     let leftMovementInterval: number;
     let rightMovementInterval: number;
 
@@ -67,7 +70,7 @@ export class Game {
         }, 33)
       }
       else if (e.key === this.arrowUp) {
-        this.jump();
+        this.jump(this.player);
       }
     })
 
@@ -80,15 +83,21 @@ export class Game {
     });
   }
 
+  private setScoreBoard(): void {
+    let scoreBoard: HTMLElement | null = document.getElementById('scoreBoard');
+    if (scoreBoard) scoreBoard.style.display = 'flex';
+  }
+
   public draw(): void {
     this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.placePlayer(this.player);
-    this.placeObstacle(0, 0, 5, 5, 'red');
+    this.placeObstacle(0, 0, 20, 30, 'red');
 
     this.activateGravity();
     this.activateCollisionOnCanvasLimits(this.player, this.canvas);
     this.activateCollisionOnObstacles(this.player, this.obstacle);
+    this.activateScoreUpdate();
   }
 
   private activateGravity(): void {
@@ -130,18 +139,18 @@ export class Game {
     if (collided) this.gameOver();
   }
 
+  private activateScoreUpdate(): void {
+    let currentScore: HTMLElement | null = document.getElementById('currentScore');
+    if (currentScore) currentScore.innerHTML = this.score.toString();
+  } 
+
   private placePlayer(player: Player): void {
     let ctx = this.canvasCtx;
 
-    ctx.beginPath();
-    ctx.rect(
-      player.offsetX,
-      player.offsetY,
-      player.width,
-      player.height
-    );
-    ctx.fillStyle = player.color;
-    ctx.fill();
+    let img = new Image();
+    img.src = '../assets/img/player-small.jpg';
+
+    ctx.drawImage(img, player.offsetX, player.offsetY, player.width, player.height);
   }
 
   private placeObstacle(x: number, y: number, w: number, h: number, c: string): void {
@@ -149,17 +158,12 @@ export class Game {
     let obstacleX: number = (this.canvas.width / 2) - (w / 2);
     let obstacleY: number = this.canvas.height - h;
 
-    this.obstacle = new Obstacle(obstacleX, obstacleY, w, h, c);
+    let img = new Image();
+    img.src = '../assets/img/obstacle-small.png';
 
-    ctx.beginPath();
-    ctx.rect(
-      obstacleX,
-      obstacleY,
-      w,
-      h
-    );
-    ctx.fillStyle = c;
-    ctx.fill();
+    this.obstacle = new Obstacle(obstacleX, obstacleY, w, h, c, img.src);
+
+    ctx.drawImage(img, obstacleX, obstacleY, w, h)
   }
 
   private moveLeft(): void {
@@ -182,21 +186,59 @@ export class Game {
     this.isMovingRight = false;
   }
 
-  private jump(): void {
-    if (this.player.offsetY === this.canvas.height - this.player.height) {
-      let jumpInterval: number;
+  private jump(p: Player): void {
+    let playerRightSide: number = p.offsetX + p.width;
+    let obstacleLeftSide: number = this.obstacle.offsetX;
 
-      jumpInterval = setInterval(() => {
-        this.player.offsetY -= this.physics.gravity * this.player.jumpForce;
-
-        if (this.player.offsetY <= (this.canvas.height - (this.player.height * (this.player.jumpForce / 3)))) 
-          clearInterval(jumpInterval);
-
-      }, 15)
+    let playerLeftOfObstacleBeforeJump: boolean = playerRightSide < obstacleLeftSide;
+    let isOnTheGround: boolean = p.offsetY === this.canvas.height - p.height;
+    
+    if (isOnTheGround) {
+      this.trackJump(p);
+      this.trackjumpLanding(p, playerLeftOfObstacleBeforeJump)
     }
   }
 
+  private trackJump(p: Player): void {
+    let interval: number;
+
+    interval = setInterval(() => {
+        p.offsetY -= this.physics.gravity * p.jumpForce;
+
+        if (p.offsetY <= (this.canvas.height - (p.height * (p.jumpForce / 3)))) 
+          clearInterval(interval);
+      }, 15)
+  }
+
+  private trackjumpLanding(p: Player, playerLeftOfObstacleBeforeJump: boolean): void {
+    let interval: number;
+
+    interval = setInterval(() => {
+      if (this.over) clearInterval(interval);
+
+      let jumpFinished: boolean = p.offsetY == this.canvas.height - p.height;
+
+      if (jumpFinished) {
+        let playerLeftOfObstacleAfterJump: boolean = this.player.offsetX < (this.obstacle.offsetX + this.obstacle.width);
+        let playerJumpedOverObstacole: boolean = playerLeftOfObstacleBeforeJump != playerLeftOfObstacleAfterJump;
+
+        if (playerJumpedOverObstacole) this.addScore();
+        clearInterval(interval);
+      }
+    }, 15)
+  }
+  
+  private addScore(): void {
+    this.score++;
+  }
+
+  private resetScore(): void {
+    this.score = 0;
+  }
+
   private gameOver(): void {
+    this.over = true;
+
     let engine = Engine.Instance;
     if (engine.active) engine.stop();
 
@@ -215,8 +257,11 @@ export class Game {
   private tryAgain(tryAgainDiv: HTMLElement): void {
     tryAgainDiv.style.display = 'none';
 
+    this.resetScore();
     this.resetPlayer(this.player);
     this.restartEngine(Engine.Instance);
+
+    this.over = false;
   }
 
   private resetPlayer(p: Player): void {

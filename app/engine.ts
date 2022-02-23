@@ -20,7 +20,7 @@ export class Engine {
 
       let countDownInterval: number = setInterval(() => {
         if (countDown > 0) {
-          loadingMessage!.innerHTML = `Game starting in ${countDown}...`; 
+          loadingMessage!.innerHTML = `Si comincia in ${countDown}...`; 
         }
         else {
           loadingMessage!.style.display = 'none';

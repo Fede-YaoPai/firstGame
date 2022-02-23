@@ -12,6 +12,7 @@ html, body {
   main {
     height: 100%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
   }
@@ -21,6 +22,12 @@ html, body {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+    color: white;
+  }
+
+  #scoreBoard {
+    display: none;
+    justify-content: center;
     color: white;
   }
 
@@ -41,4 +48,6 @@ html, body {
     font-weight: bold;
     padding: 10px;
     cursor: pointer;
+    background-color: darkgoldenrod;
+    color: white;
   }
