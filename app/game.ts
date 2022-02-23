@@ -5,7 +5,7 @@ import { Arrows } from "./utils/constants.js";
 
 
 export class Game {
-  public running: boolean = false;
+  private static _instance: Game;
 
   private canvas!: HTMLCanvasElement;
   private canvasSettings = new CanvasConfig();
@@ -20,12 +20,23 @@ export class Game {
   private readonly arrowLeft: string = Arrows.Left;
   private readonly arrowUp: string = Arrows.Up;
 
-  constructor() {}
+  private constructor() {}
 
-  public setCanvas(canvas: HTMLCanvasElement): void {
+  public static get Instance() {
+    return this._instance || (this._instance = new this());
+  }
+
+  public setUp(): void {
+    let canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
+
+    this.setCanvas(canvas);
+    this.addMovementListeners();
+  }
+
+  private setCanvas(canvas: HTMLCanvasElement): void {
     this.canvas = canvas;
-    this.canvas.style.height = this.canvasSettings.height + 'px';
-    this.canvas.style.width = this.canvasSettings.width + 'px';
+    this.canvas.style.height = this.canvasSettings.height + 'vh';
+    this.canvas.style.width = this.canvasSettings.width + 'vw';
     this.canvas.style.backgroundColor = this.canvasSettings.backgroundColor;
     this.canvas.style.border = this.canvasSettings.border;
     this.canvas.style.borderRadius = this.canvasSettings.borderRadius;
@@ -34,48 +45,7 @@ export class Game {
     if (ctx) this.canvasCtx = ctx;    
   }
 
-  public start(): void {
-    this.running = true;
-    this.draw();
-  }
-
-  public draw(): void {
-    setInterval(() => {
-      this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-      this.canvasCtx.beginPath();
-      this.canvasCtx.rect(
-        this.player.offsetX,
-        this.player.offsetY,
-        this.player.width,
-        this.player.height
-      );
-      this.canvasCtx.fill();
-
-      this.activateGravity();
-      this.activateCollisionOnCanvasLimits();
-    }, 1)
-  }
-
-  private activateGravity(): void {
-    this.player.offsetY += this.physics.gravity;
-  }
-
-  private activateCollisionOnCanvasLimits(): void {
-    if (this.player.offsetY + this.player.height > this.canvas.height) 
-      this.player.offsetY = this.canvas.height - this.player.height;
-    
-    if (this.player.offsetY < 0) 
-      this.player.offsetY = 0;
-    
-    if (this.player.offsetX + this.player.width > this.canvas.width) 
-      this.player.offsetX = this.canvas.width - this.player.width;
-
-    if (this.player.offsetX < 0) 
-      this.player.offsetX = 0;
-  }
-
-  public addMovementListeners(): void {
+  private addMovementListeners(): void {
     let leftMovementInterval: number;
     let rightMovementInterval: number;
 
@@ -105,6 +75,40 @@ export class Game {
     });
   }
 
+  public draw(): void {
+    this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.canvasCtx.beginPath();
+    this.canvasCtx.rect(
+      this.player.offsetX,
+      this.player.offsetY,
+      this.player.width,
+      this.player.height
+    );
+    this.canvasCtx.fill();
+
+    this.activateGravity();
+    this.activateCollisionOnCanvasLimits();
+  }
+
+  private activateGravity(): void {
+    this.player.offsetY += this.physics.gravity;
+  }
+
+  private activateCollisionOnCanvasLimits(): void {
+    if (this.player.offsetY + this.player.height > this.canvas.height) 
+      this.player.offsetY = this.canvas.height - this.player.height;
+    
+    if (this.player.offsetY < 0) 
+      this.player.offsetY = 0;
+    
+    if (this.player.offsetX + this.player.width > this.canvas.width) 
+      this.player.offsetX = this.canvas.width - this.player.width;
+
+    if (this.player.offsetX < 0) 
+      this.player.offsetX = 0;
+  }
+
   private moveLeft(): void {
     this.player.offsetX -= this.player.runSpeed;
     this.isMovingLeft = true;
@@ -132,7 +136,7 @@ export class Game {
       jumpInterval = setInterval(() => {
         this.player.offsetY -= this.physics.gravity * this.player.jumpForce;
 
-        if (this.player.offsetY <= (this.canvas.height - (this.player.height * 3))) 
+        if (this.player.offsetY <= (this.canvas.height - (this.player.height * (this.player.jumpForce / 3)))) 
           clearInterval(jumpInterval);
 
       }, 15)
@@ -140,3 +144,7 @@ export class Game {
   }
 
 }
+
+
+
+// questo file è da modificare

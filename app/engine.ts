@@ -4,7 +4,7 @@ export class Engine {
 
   public active: boolean = false;
   public engineId: number = 0;
-  public game = new Game();
+  public game = Game.Instance;
 
   constructor() {}
 
@@ -23,12 +23,16 @@ export class Engine {
           resolve(true);
         }
         countDown--;
-      }, 1000);
+      }, 750);
     })
   }
 
   public start(): void {
     this.active = true;
+
+    setInterval(() => {
+      this.game.draw();
+    }, 3)
   }
 
   public stop(): void {
@@ -37,3 +41,5 @@ export class Engine {
   }
 
 }
+
+// questo file NON è da modificare
