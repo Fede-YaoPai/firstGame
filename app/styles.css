@@ -6,6 +6,7 @@ html, body {
 
   body {
     background-color: #555;
+    font-family: sans-serif;
   }
 
   main {
@@ -21,4 +22,23 @@ html, body {
     top: 50%;
     transform: translate(-50%, -50%);
     color: white;
+  }
+
+  #gameOverMessage {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #555;
+    border-radius: 3px;
+    padding: 30px 60px;
+    color: white;
+    display: none;
+  }
+
+  #gameOverMessage button {
+    width: 100%;
+    font-weight: bold;
+    padding: 10px;
+    cursor: pointer;
   }

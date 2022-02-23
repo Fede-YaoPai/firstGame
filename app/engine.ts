@@ -1,12 +1,17 @@
 import { Game } from "./game.js";
 
 export class Engine {
+  private static _instance: Engine;
 
   public active: boolean = false;
   public engineId: number = 0;
   public game = Game.Instance;
 
   constructor() {}
+
+  public static get Instance(): Engine {
+    return this._instance || (this._instance = new this());
+  }
 
   public load(): Promise<boolean> {
     return new Promise<boolean>(resolve => {
@@ -15,7 +20,7 @@ export class Engine {
 
       let countDownInterval: number = setInterval(() => {
         if (countDown > 0) {
-          loadingMessage!.innerHTML = `Game engine starting in ${countDown}...`; 
+          loadingMessage!.innerHTML = `Game starting in ${countDown}...`; 
         }
         else {
           loadingMessage!.style.display = 'none';
@@ -29,15 +34,16 @@ export class Engine {
 
   public start(): void {
     this.active = true;
+    clearInterval(this.engineId);
 
-    setInterval(() => {
+    this.engineId = setInterval(() => {
       this.game.draw();
-    }, 3)
+    }, 1);
   }
 
   public stop(): void {
     this.active = false;
-    clearInterval(this.engineId)
+    clearInterval(this.engineId);
   }
 
 }
