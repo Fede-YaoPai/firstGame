@@ -5,7 +5,7 @@ import { Arrows } from "./utils/constants.js";
 
 
 export class Game {
-  public running: boolean = false;
+  private static _instance: Game;
 
   private canvas!: HTMLCanvasElement;
   private canvasSettings = new CanvasConfig();
@@ -20,7 +20,11 @@ export class Game {
   private readonly arrowLeft: string = Arrows.Left;
   private readonly arrowUp: string = Arrows.Up;
 
-  constructor() {}
+  private constructor() {}
+
+  public static get Instance() {
+    return this._instance || (this._instance = new this());
+  }
 
   public setCanvas(canvas: HTMLCanvasElement): void {
     this.canvas = canvas;
@@ -34,27 +38,20 @@ export class Game {
     if (ctx) this.canvasCtx = ctx;    
   }
 
-  public start(): void {
-    this.running = true;
-    this.draw();
-  }
-
   public draw(): void {
-    setInterval(() => {
-      this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-      this.canvasCtx.beginPath();
-      this.canvasCtx.rect(
-        this.player.offsetX,
-        this.player.offsetY,
-        this.player.width,
-        this.player.height
-      );
-      this.canvasCtx.fill();
+    this.canvasCtx.beginPath();
+    this.canvasCtx.rect(
+      this.player.offsetX,
+      this.player.offsetY,
+      this.player.width,
+      this.player.height
+    );
+    this.canvasCtx.fill();
 
-      this.activateGravity();
-      this.activateCollisionOnCanvasLimits();
-    }, 1)
+    this.activateGravity();
+    this.activateCollisionOnCanvasLimits();
   }
 
   private activateGravity(): void {

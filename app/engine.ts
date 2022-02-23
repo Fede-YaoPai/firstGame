@@ -4,7 +4,7 @@ export class Engine {
 
   public active: boolean = false;
   public engineId: number = 0;
-  public game = new Game();
+  public game = Game.Instance;
 
   constructor() {}
 
@@ -29,6 +29,10 @@ export class Engine {
 
   public start(): void {
     this.active = true;
+
+    setInterval(() => {
+      this.game.draw();
+    }, 1)
   }
 
   public stop(): void {
