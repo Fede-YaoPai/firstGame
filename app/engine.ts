@@ -23,7 +23,7 @@ export class Engine {
           resolve(true);
         }
         countDown--;
-      }, 1000);
+      }, 750);
     })
   }
 
@@ -32,7 +32,7 @@ export class Engine {
 
     setInterval(() => {
       this.game.draw();
-    }, 1)
+    }, 3)
   }
 
   public stop(): void {

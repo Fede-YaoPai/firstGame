@@ -26,16 +26,53 @@ export class Game {
     return this._instance || (this._instance = new this());
   }
 
-  public setCanvas(canvas: HTMLCanvasElement): void {
+  public setUp(): void {
+    let canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
+
+    this.setCanvas(canvas);
+    this.addMovementListeners();
+  }
+
+  private setCanvas(canvas: HTMLCanvasElement): void {
     this.canvas = canvas;
-    this.canvas.style.height = this.canvasSettings.height + 'px';
-    this.canvas.style.width = this.canvasSettings.width + 'px';
+    this.canvas.style.height = this.canvasSettings.height + 'vh';
+    this.canvas.style.width = this.canvasSettings.width + 'vw';
     this.canvas.style.backgroundColor = this.canvasSettings.backgroundColor;
     this.canvas.style.border = this.canvasSettings.border;
     this.canvas.style.borderRadius = this.canvasSettings.borderRadius;
 
     let ctx = canvas.getContext('2d');
     if (ctx) this.canvasCtx = ctx;    
+  }
+
+  private addMovementListeners(): void {
+    let leftMovementInterval: number;
+    let rightMovementInterval: number;
+
+    window.addEventListener('keydown', (e: KeyboardEvent) => {
+      
+      if (e.key === this.arrowLeft && !this.isMovingLeft) {
+        leftMovementInterval = setInterval(() => {
+          this.moveLeft();
+        }, 33)
+      }
+      else if (e.key === this.arrowRight && !this.isMovingRight) {
+        rightMovementInterval = setInterval(() => {
+          this.moveRight();
+        }, 33)
+      }
+      else if (e.key === this.arrowUp) {
+        this.jump();
+      }
+    })
+
+    window.addEventListener('keyup', (e: KeyboardEvent) => {
+      if (e.key === this.arrowLeft && this.isMovingLeft) 
+        this.stopMovingLeft(leftMovementInterval);
+
+      else if (e.key === this.arrowRight && this.isMovingRight)
+        this.stopMovingRight(rightMovementInterval);
+    });
   }
 
   public draw(): void {
@@ -72,36 +109,6 @@ export class Game {
       this.player.offsetX = 0;
   }
 
-  public addMovementListeners(): void {
-    let leftMovementInterval: number;
-    let rightMovementInterval: number;
-
-    window.addEventListener('keydown', (e: KeyboardEvent) => {
-      
-      if (e.key === this.arrowLeft && !this.isMovingLeft) {
-        leftMovementInterval = setInterval(() => {
-          this.moveLeft();
-        }, 33)
-      }
-      else if (e.key === this.arrowRight && !this.isMovingRight) {
-        rightMovementInterval = setInterval(() => {
-          this.moveRight();
-        }, 33)
-      }
-      else if (e.key === this.arrowUp) {
-        this.jump();
-      }
-    })
-
-    window.addEventListener('keyup', (e: KeyboardEvent) => {
-      if (e.key === this.arrowLeft && this.isMovingLeft) 
-        this.stopMovingLeft(leftMovementInterval);
-
-      else if (e.key === this.arrowRight && this.isMovingRight)
-        this.stopMovingRight(rightMovementInterval);
-    });
-  }
-
   private moveLeft(): void {
     this.player.offsetX -= this.player.runSpeed;
     this.isMovingLeft = true;
@@ -129,7 +136,7 @@ export class Game {
       jumpInterval = setInterval(() => {
         this.player.offsetY -= this.physics.gravity * this.player.jumpForce;
 
-        if (this.player.offsetY <= (this.canvas.height - (this.player.height * 3))) 
+        if (this.player.offsetY <= (this.canvas.height - (this.player.height * (this.player.jumpForce / 3)))) 
           clearInterval(jumpInterval);
 
       }, 15)
