@@ -1,7 +1,7 @@
 export enum Arrows {
-  Left = 'ArrowLeft',
-  Right = 'ArrowRight',
-  Up = 'ArrowUp'
+  Left = 'a',
+  Right = 'd',
+  Up = 'w'
 }
 
 export enum PlayerInit {

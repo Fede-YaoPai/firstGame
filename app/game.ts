@@ -58,7 +58,7 @@ export class Game {
     let rightMovementInterval: number;
 
     window.addEventListener('keydown', (e: KeyboardEvent) => {
-      
+   
       if (e.key === this.arrowLeft && !this.isMovingLeft) {
         leftMovementInterval = setInterval(() => {
           this.moveLeft();
