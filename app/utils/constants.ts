@@ -14,3 +14,10 @@ export enum PlayerInit {
   Color = 'black',
   Img = 'player.jpg'
 }
+
+export interface ObjectSides {
+  top: number,
+  right: number,
+  bottom: number,
+  left: number
+}

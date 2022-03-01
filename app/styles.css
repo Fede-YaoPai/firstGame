@@ -36,7 +36,7 @@ html, body {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    background-color: #555;
+    background-color: rgb(80, 52, 52);
     border-radius: 3px;
     padding: 30px 60px;
     color: white;
@@ -48,6 +48,9 @@ html, body {
     font-weight: bold;
     padding: 10px;
     cursor: pointer;
-    background-color: darkgoldenrod;
+    background-color: rgb(117, 27, 105);
     color: white;
+    border-radius: 3px;
+    border: none;
+    outline: none;
   }

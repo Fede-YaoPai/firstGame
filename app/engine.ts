@@ -20,7 +20,7 @@ export class Engine {
 
       let countDownInterval: number = setInterval(() => {
         if (countDown > 0) {
-          loadingMessage!.innerHTML = `Si comincia in ${countDown}...`; 
+          loadingMessage!.innerHTML = `Get ready: ${countDown}...`; 
         }
         else {
           loadingMessage!.style.display = 'none';
@@ -28,7 +28,7 @@ export class Engine {
           resolve(true);
         }
         countDown--;
-      }, 750);
+      }, 500);
     })
   }
 

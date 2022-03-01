@@ -8,10 +8,13 @@
   <title>First Game</title>
 </head>
 <body>
-  <h1 style="text-align: center; color: white; position: absolute; top: 0; width: 100%;">Evita il sugo!</h1>
+  <div style="position: absolute; top: 0; width: 100%; text-align: center; color: white;">
+    <h1>Jump over the obstacles!</h1>
+    <h6>* Use WASD to move *</h6>
+  </div>
   <main>
     <div id="scoreBoard">
-      <h2>Punteggio: </h2>&nbsp;&nbsp;<h2 id="currentScore">0</h2>
+      <h2>Score: </h2>&nbsp;&nbsp;<h2 id="currentScore">0</h2>
     </div>
     <div>
       <canvas id="canvas"></canvas>
@@ -19,8 +22,8 @@
   </main>
   <h2 id="loadingMessage"></h2>
   <div id="gameOverMessage">
-    <h2>Fatto al sugo!!!</h2>
-    <button>Riprova</button>
+    <h2>Game Over</h2>
+    <button>Try again</button>
   </div>
 </body>
 <script>var exports = {};</script>

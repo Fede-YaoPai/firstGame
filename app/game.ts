@@ -3,7 +3,7 @@ import { CanvasConfig } from "./game-components/canvas.js";
 import { Obstacle } from "./game-components/obstacle.js";
 import { Physics } from "./game-components/physics.js";
 import { Player } from "./game-components/player.js";
-import { Arrows, PlayerInit } from "./utils/constants.js";
+import { Arrows, ObjectSides, PlayerInit } from "./utils/constants.js";
 
 
 export class Game {
@@ -119,21 +119,14 @@ export class Game {
   }
 
   private activateCollisionOnObstacles(p: Player, o: Obstacle): void {
-    let playerRightSide: number = p.offsetX + p.width;
-    let playerLeftSide: number = p.offsetX;
-    let playerTopSide: number = p.offsetY;
-    let playerBottomSide: number = p.offsetY + p.height;
-    
-    let obstacleRightSide: number = o.offsetX + o.width;
-    let obstacleLeftSide: number = o.offsetX;
-    let obstacleTopSide: number = o.offsetY;
-    let obstacleBottomSide: number = o.offsetY + o.height;
+    let playerSides: ObjectSides = this.getObjectSides(p);
+    let obstacleSides: ObjectSides = this.getObjectSides(o);
 
     let collided: boolean = 
-      (playerRightSide >= obstacleLeftSide) && 
-      (playerLeftSide <= obstacleRightSide) && 
-      (playerBottomSide >= obstacleTopSide) &&
-      (playerTopSide <= obstacleBottomSide)
+      (playerSides.right >= obstacleSides.left) && 
+      (playerSides.left <= obstacleSides.right) && 
+      (playerSides.bottom >= obstacleSides.top) &&
+      (playerSides.top <= obstacleSides.bottom)
     ;
 
     if (collided) this.gameOver();
@@ -143,6 +136,17 @@ export class Game {
     let currentScore: HTMLElement | null = document.getElementById('currentScore');
     if (currentScore) currentScore.innerHTML = this.score.toString();
   } 
+
+  private getObjectSides(obj: Player | Obstacle): ObjectSides {
+    let sides: ObjectSides = {
+      top: obj.offsetY,
+      right: obj.offsetX + obj.width,
+      bottom: obj.offsetY + obj.height,
+      left: obj.offsetX
+    };
+
+    return sides;
+  }
 
   private placePlayer(player: Player): void {
     let ctx = this.canvasCtx;
@@ -187,12 +191,13 @@ export class Game {
   }
 
   private jump(p: Player): void {
-    let playerRightSide: number = p.offsetX + p.width;
-    let obstacleLeftSide: number = this.obstacle.offsetX;
+    let playerRightSide: number = this.getObjectSides(p).right;
+    let obstacleLeftSide: number = this.getObjectSides(this.obstacle).left;
 
     let playerLeftOfObstacleBeforeJump: boolean = playerRightSide < obstacleLeftSide;
-    let isOnTheGround: boolean = p.offsetY === this.canvas.height - p.height;
-    
+
+    let isOnTheGround: boolean = this.getObjectSides(p).bottom === this.canvas.height;
+
     if (isOnTheGround) {
       this.trackJump(p);
       this.trackjumpLanding(p, playerLeftOfObstacleBeforeJump)
@@ -216,13 +221,13 @@ export class Game {
     interval = setInterval(() => {
       if (this.over) clearInterval(interval);
 
-      let jumpFinished: boolean = p.offsetY == this.canvas.height - p.height;
+      let jumpFinished: boolean = this.getObjectSides(p).bottom === this.canvas.height;
 
       if (jumpFinished) {
-        let playerLeftOfObstacleAfterJump: boolean = this.player.offsetX < (this.obstacle.offsetX + this.obstacle.width);
-        let playerJumpedOverObstacole: boolean = playerLeftOfObstacleBeforeJump != playerLeftOfObstacleAfterJump;
+        let playerLeftOfObstacleAfterJump: boolean = this.getObjectSides(p).right < (this.getObjectSides(this.obstacle).left);
+        let playerJumpedOverObstacle: boolean = playerLeftOfObstacleBeforeJump != playerLeftOfObstacleAfterJump;
 
-        if (playerJumpedOverObstacole) this.addScore();
+        if (playerJumpedOverObstacle) this.addScore();
         clearInterval(interval);
       }
     }, 15)
